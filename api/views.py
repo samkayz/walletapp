@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 import random
 import string
+from datetime import datetime
 from monify import *
 
 # Create your views here.
@@ -81,5 +82,64 @@ def account(request, mobile):
             "code": status.HTTP_400_BAD_REQUEST,
             "status": "fail",
             "reason": "Account doestn't exist within the system"
+        }
+        return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([])
+def transfer(request, mobile):
+    U = 6
+    res = ''.join(random.choices(string.digits, k=U))
+    txn = str(res)
+    txt_id = "TX" + txn
+    base_date_time = datetime.now()
+    now = (datetime.strftime(base_date_time, "%Y-%m-%d %H:%M %p"))
+    amount = request.data.get('amount')
+    rec = request.data.get('reciever')
+    pin = request.data.get('pin')
+    checkPin = MyClass.CheckPin(mobile, pin)
+    if checkPin == True:
+        checkbal = MyClass.CheckBal(mobile, amount)
+        if checkbal == True:
+            if User.objects.filter(mobile=rec).exists():
+                if mobile == rec:
+                    data = {
+                        "code": status.HTTP_400_BAD_REQUEST,
+                        "status": "fail",
+                        "reason": "You can't send money to yourself"
+                    }
+                    return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    amt = float(amount)
+                    MyClass.SendMoney(amount, mobile, rec)
+                    MyClass.CreateLog(mobile, rec, txt_id, amt, now, status="PAID", desc="Wallet Transfer")
+                    data = {
+                        "code": status.HTTP_200_OK,
+                        "status": "success",
+                        "reason": f'{amt} was sent to {rec}'
+                    }
+                    return Response(data=data, status=status.HTTP_200_OK)
+            else:
+                data = {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "status": "fail",
+                    "reason": "User not found"
+                }
+                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+        
+        else:
+            data = {
+                "code": status.HTTP_400_BAD_REQUEST,
+                "status": "fail",
+                "reason": "Insufficient balance"
+            }
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+    
+    else:
+        data = {
+            "code": status.HTTP_400_BAD_REQUEST,
+            "status": "fail",
+            "reason": "Invalid Transaction Pin"
         }
         return Response(data=data, status=status.HTTP_400_BAD_REQUEST)

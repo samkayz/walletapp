@@ -27,8 +27,15 @@ SECRET_KEY = 'iaiwf&*rf3ju##i*zb(ga@sjn#&s7^uq-l)=_2+g5cz8ir8z83'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+
+EMAIL_HOST = 'smtp.mailtrap.io'
+EMAIL_HOST_USER = '38c207b30aaed1'
+EMAIL_HOST_PASSWORD = '268069f96f1e35'
+EMAIL_PORT = '2525'
+EMAIL_FROM = 'hello@payflat.com'
+DEFAULT_FROM_EMAIL = 'hello@payflat.com'
 
 # Application definition
 
