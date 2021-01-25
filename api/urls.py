@@ -12,4 +12,6 @@ urlpatterns = [
     path('signup', views.signup, name='signup'),
     path('account/<mobile>', views.account, name='account'),
     path('transfer/<mobile>', views.transfer, name='transfer'),
+    path('accountVerify', views.accountVerify, name='accountVerify'),
+    path('btranfer/<mobile>', views.btranfer, name='btranfer'),
 ]

@@ -94,6 +94,7 @@ class Log(models.Model):
     date = models.TextField(null=True, blank=True)
     status = models.TextField(null=True, blank=True)
     desc = models.TextField(null=True, blank=True)
+    fee = models.TextField(null=True, blank=True)
 
     class Meta:
         db_table = 'log'

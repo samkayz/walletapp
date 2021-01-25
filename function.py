@@ -48,8 +48,8 @@ class Main:
         return bal
 
 
-    def CreateLog(self, mobile, rmobile, ref, amount, date, status, desc):
-        clog = Log(mobile=mobile, rmobile=rmobile, ref=ref, amount=amount, date=date, status=status, desc=desc)
+    def CreateLog(self, mobile, rmobile, ref, amount, date, status, desc, fee):
+        clog = Log(mobile=mobile, rmobile=rmobile, ref=ref, amount=amount, date=date, status=status, desc=desc, fee=fee)
         clog.save()
         pass
 
@@ -93,4 +93,13 @@ class Main:
         newrecBal = rbal + amt
         recr = Wallet.objects.filter(mobile=rec)
         recr.update(bal=newrecBal)
+        pass
+
+
+    def BankTransfer(self, mobile, amount):
+        amt = float(amount)
+        bal = Wallet.objects.values('bal').get(mobile=mobile)['bal']
+        newBal = (bal - amt)
+        sendr = Wallet.objects.filter(mobile=mobile)
+        sendr.update(bal=newBal)
         pass

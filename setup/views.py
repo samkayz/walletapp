@@ -48,7 +48,7 @@ def confirm(request):
     ref = body['paymentReference']
     if stat == "PAID":
         NewFunt.UpdateWallet(mobile, amountPaid)
-        NewFunt.CreateLog(mobile, mobile, ref, amountPaid, paidOn, stat, desc)
+        NewFunt.CreateLog(mobile, mobile, ref, amountPaid, paidOn, stat, desc, fee='0')
         return HttpResponse(request_json, status=200)
     else:
         return HttpResponse(request_json, status=400)

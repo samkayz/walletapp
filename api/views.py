@@ -16,7 +16,7 @@ MyClass = Main()
 User = get_user_model()
 mon = Monnify()
 
-
+ex = 100
 
 @api_view(['POST'])
 @permission_classes([])
@@ -143,3 +143,109 @@ def transfer(request, mobile):
             "reason": "Invalid Transaction Pin"
         }
         return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([])
+def accountVerify(request):
+    acctno = request.data.get('accountNumber')
+    bcode = request.data.get('bankCode')
+
+    verify = mon.VerifyAccount(acctno, bcode)
+    stat = verify['requestSuccessful']
+    if stat == True:
+        body = verify['responseBody']
+        acct = body['accountNumber']
+        acctname = body['accountName']
+        bankCode = body['bankCode']
+
+        data = {
+            "code": status.HTTP_200_OK,
+            "status": "success",
+            "accountNumber": acct,
+            "accountName": acctname,
+            "bankCode": bankCode,
+
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
+    
+    else:
+        msg = verify['responseMessage']
+        data = {
+            "code": status.HTTP_400_BAD_REQUEST,
+            "status": "fail",
+            "reason": msg
+        }
+        return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([])
+def btranfer(request, mobile):
+    U = 6
+    res = ''.join(random.choices(string.digits, k=U))
+    txn = str(res)
+    txt_id = "TX" + txn
+    base_date_time = datetime.now()
+    now = (datetime.strftime(base_date_time, "%Y-%m-%d %H:%M %p"))
+    amount = request.data.get('amount')
+    rec = request.data.get('accountNumber')
+    bcode = request.data.get('bankCode')
+    pin = request.data.get('pin')
+    desc = "USSD"
+    stat = "PAID"
+    checkPin = MyClass.CheckPin(mobile, pin)
+    if User.objects.filter(mobile=mobile).exists() == False:
+        data = {
+            "code": status.HTTP_400_BAD_REQUEST,
+            "status": "fail",
+            "reason": "Account doestn't exist within the system"
+        }
+        return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif checkPin == True:
+        ammt = (float(ex) + float(amount))
+        checkbal = MyClass.CheckBal(mobile, ammt)
+        if checkbal == True:
+            trans = mon.BankTransfer(amount, txt_id, desc, bcode, rec )
+            statrep = trans['requestSuccessful']
+            if statrep == True:
+                body = trans['responseBody']
+                fee = float(body['totalFee'])
+                amt = (fee + float(amount))
+                MyClass.BankTransfer(mobile, amt)
+                MyClass.CreateLog(mobile, rec, txt_id, amount, now, stat, desc, fee)
+                data = {
+                    "code": status.HTTP_200_OK,
+                    "status": "sucess",
+                    "amount": amount,
+                    "fee": fee,
+                    "reason": f'You have sent {float(amount)} to {rec}'
+                }
+                return Response(data=data, status=status.HTTP_200_OK)
+            else:
+                msg = trans['responseMessage']
+                data = {
+                    "code": status.HTTP_400_BAD_REQUEST,
+                    "status": "fail",
+                    "reason": msg
+                }
+                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            data = {
+                "code": status.HTTP_400_BAD_REQUEST,
+                "status": "fail",
+                "reason": "Insufficient balance"
+            }
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+    
+    else:
+        data = {
+            "code": status.HTTP_400_BAD_REQUEST,
+            "status": "fail",
+            "reason": "Invalid Transaction Pin"
+        }
+        return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+

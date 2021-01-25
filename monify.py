@@ -8,6 +8,7 @@ username = "MK_TEST_8UBXGKTFSB"
 password = "ENRC4FDYKSTUYQKA53YPXBFLUFXWYHG2"
 contract = "2917634474"
 baseurl = "https://sandbox.monnify.com"
+walletId = "654CAB2118124760A659C787B2AA38E8"
 
 def Auth():
     response = requests.post(f'{baseurl}/api/v1/auth/login', 
@@ -57,3 +58,37 @@ class Monnify:
         stat = resv[0]
         # print(r_dict)
         return res, stat
+
+    
+    def VerifyAccount(self, acctno, bcode):
+        url = f'{baseurl}/api/v1/disbursements/account/validate?accountNumber={acctno}&bankCode={bcode}'
+
+        payload = {}
+        headers= {}
+
+        response = requests.request("GET", url, headers=headers, data = payload)
+
+        r_dict = json.loads(response.text)
+        return r_dict
+
+    
+    def BankTransfer(self, amount, txnid, desc, bcode, acctno):
+        url = f'{baseurl}/api/v1/disbursements/single'
+
+        payload = {
+            'amount': amount,
+            'reference': txnid,
+            'narration': desc,
+            'bankCode': bcode,
+            'accountNumber': acctno,
+            'currency': 'NGN',
+            'walletId': walletId
+            }
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request("POST", url, auth=HTTPBasicAuth(username, password), headers=headers, data = json.dumps(payload))
+
+        r_dict = json.loads(response.text)
+        return r_dict
