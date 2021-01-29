@@ -22,15 +22,15 @@ mon = Monnify()
 
 
 class Main:
-    def Signup(self, mobile, pwd, role):
-        res = mon.ReserveAccount(mobile)
+    def Signup(self, email, mobile, pwd, role):
+        res = mon.ReserveAccount(email, mobile)
         
         status = res[1]
         if status == True:
             accountNumber = res[0]['accountNumber']
             bankName = res[0]['bankName']
 
-            user = User.objects.create_user(email="", mobile=mobile, password=pwd, role=role)
+            user = User.objects.create_user(email=email, mobile=mobile, password=pwd, role=role)
             wal = Wallet(mobile=mobile, acctno=accountNumber, bank=bankName)
             pin = Pins(mobile=mobile, pin=pwd)
             user.save()

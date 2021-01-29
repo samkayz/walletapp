@@ -21,6 +21,7 @@ ex = 100
 @api_view(['POST'])
 @permission_classes([])
 def signup(request):
+    email = request.data.get('email')
     mobile = request.data.get('mobile')
     pwd = request.data.get('pwd')
     role = request.data.get('role')
@@ -54,7 +55,7 @@ def signup(request):
         }
         return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
     else:
-        MyClass.Signup(mobile, pwd, role)
+        MyClass.Signup(email, mobile, pwd, role)
         data = {
             "code": status.HTTP_200_OK,
             "status": "success",
@@ -64,7 +65,7 @@ def signup(request):
 
 
 @api_view(['GET'])
-@permission_classes([])
+@permission_classes([IsAuthenticated])
 def account(request, mobile):
     try:
         bal = MyClass.GetWalletBall(mobile)
@@ -87,7 +88,7 @@ def account(request, mobile):
 
 
 @api_view(['POST'])
-@permission_classes([])
+@permission_classes([IsAuthenticated])
 def transfer(request, mobile):
     U = 6
     res = ''.join(random.choices(string.digits, k=U))
@@ -146,7 +147,7 @@ def transfer(request, mobile):
 
 
 @api_view(['POST'])
-@permission_classes([])
+@permission_classes([IsAuthenticated])
 def accountVerify(request):
     acctno = request.data.get('accountNumber')
     bcode = request.data.get('bankCode')
@@ -180,7 +181,7 @@ def accountVerify(request):
 
 
 @api_view(['POST'])
-@permission_classes([])
+@permission_classes([IsAuthenticated])
 def btranfer(request, mobile):
     U = 6
     res = ''.join(random.choices(string.digits, k=U))

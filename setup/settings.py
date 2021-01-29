@@ -94,7 +94,7 @@ WSGI_APPLICATION = 'setup.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'payment',
+        'NAME': 'walletapp',
         'USER': 'root',
         'PASSWORD': 'victoria1992',
         'HOST': 'localhost',

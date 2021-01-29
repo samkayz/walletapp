@@ -30,7 +30,7 @@ __name__ == "__main__"
 
 class Monnify:
     
-    def ReserveAccount(self, mobile):
+    def ReserveAccount(self,email, mobile):
         url = f'{baseurl}/api/v1/bank-transfer/reserved-accounts'
         key = Auth()
         payload = {
@@ -38,7 +38,7 @@ class Monnify:
             "accountName": mobile,
             "currencyCode": "NGN",
             "contractCode": contract,
-            "customerEmail": 'system@gmail.com', 
+            "customerEmail": email, 
             "customerName": mobile 
             }
         headers = {
